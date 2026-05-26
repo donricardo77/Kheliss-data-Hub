@@ -379,15 +379,18 @@ req.log.info(`[Paystack Webhook] Order ${order._id} payment confirmed, calling A
                 throw new Error(`Invalid data amount for AllenDataHub: ${product.dataAmount}`);
               }
 
+              const webhookTarget = `${req.protocol}://${req.get("host")}/api/vendor/allen-datahub/webhook`;
               const result = await allenDataHubService.purchaseDataBundle({
                 phoneNumber: formattedPhone,
                 network: product.network,
                 volume,
+                webhookUrl: webhookTarget,
               });
               
               if (result && result.success) {
                 order.vendorOrderId = result.transactionId || result.orderId;
                 order.vendorReference = result.reference; // Store reference for webhook lookup
+                order.vendorWebhookUrl = webhookTarget;
                 order.vendorProductId = vendorProductId;
                 order.vendorStatus = result.status || "pending";
                 order.status = "processing";

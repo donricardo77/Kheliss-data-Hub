@@ -60,11 +60,12 @@ router.post("/purchase", requireAuth, requireAgent, async (req: Request, res: Re
       return res.status(400).json({ error: normalized.error || "Invalid phone number" });
     }
 
+    const webhookTarget = webhookUrl || `${req.protocol}://${req.get("host")}/api/vendor/allen-datahub/webhook`;
     const result = await allenDataHubService.purchaseDataBundle({
       phoneNumber: normalized.formatted,
       network,
       volume: Number(volume),
-      webhookUrl,
+      webhookUrl: webhookTarget,
     });
 
     if (!result.success) {
@@ -88,6 +89,7 @@ router.post("/purchase", requireAuth, requireAgent, async (req: Request, res: Re
       paymentMethod: "vendor_wallet",
       paymentReference: result.reference,
       vendorOrderId,
+      vendorWebhookUrl: webhookTarget,
       vendorReference: result.reference,
       vendorProductId: `${network}_${volume}`,
       vendorPhoneNumber: normalized.formatted,

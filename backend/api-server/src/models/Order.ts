@@ -22,6 +22,7 @@ const OrderSchema = new mongoose.Schema({
   // Vendor integration fields
   vendorOrderId: { type: String, index: true },
   vendorReference: { type: String, index: true }, // Reference returned by vendor
+  vendorWebhookUrl: { type: String },
   vendorProductId: { type: String },
   vendorPhoneNumber: { type: String },
   vendorStatus: { type: String, enum: ["pending", "processing", "completed", "failed"] },
@@ -49,6 +50,7 @@ export interface IOrder {
   idempotencyKey?: string;
   vendorOrderId?: string;
   vendorReference?: string; // Reference returned by vendor
+  vendorWebhookUrl?: string;
   vendorProductId?: string;
   vendorPhoneNumber?: string;
   vendorStatus?: "pending" | "processing" | "completed" | "failed";

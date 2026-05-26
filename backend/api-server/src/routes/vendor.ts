@@ -66,11 +66,12 @@ router.post("/purchase", requireAuth, async (req: Request, res: Response) => {
       });
     }
 
+    const webhookTarget = webhookUrl || `${req.protocol}://${req.get("host")}/api/vendor/allen-datahub/webhook`;
     const result = await allenDataHubService.purchaseDataBundle({
       phoneNumber,
       network: resolvedNetwork,
       volume: resolvedVolume,
-      webhookUrl,
+      webhookUrl: webhookTarget,
     });
 
     if (!result || !result.success) {
@@ -85,6 +86,7 @@ router.post("/purchase", requireAuth, async (req: Request, res: Response) => {
       username: user.username,
       vendorOrderId: result.orderId || result.transactionId,
       vendorReference: result.reference,
+      vendorWebhookUrl: webhookTarget,
       vendorProductId: `${resolvedNetwork}_${resolvedVolume}`,
       vendorPhoneNumber: phoneNumber,
       network: resolvedNetwork,

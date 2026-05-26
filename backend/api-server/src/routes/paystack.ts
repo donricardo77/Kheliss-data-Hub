@@ -115,15 +115,18 @@ router.post("/webhook", async (req: Request, res: Response) => {
               }
               req.log.info(`[Paystack Webhook] Calling AllenDataHub for order ${order._id}. Phone: ${order.recipientPhone} → ${formattedPhone}`);
 
+              const webhookTarget = `${req.protocol}://${req.get("host")}/api/vendor/allen-datahub/webhook`;
               const result = await allenDataHubService.purchaseDataBundle({
                 phoneNumber: formattedPhone,
                 network: product.network,
                 volume,
+                webhookUrl: webhookTarget,
               });
 
               if (result && result.success) {
                 order.vendorOrderId = result.transactionId || result.orderId;
                 order.vendorReference = result.reference; // Store reference for webhook lookup
+                order.vendorWebhookUrl = webhookTarget;
                 order.vendorProductId = vendorProductId;
                 order.vendorStatus = result.status || "pending";
                 order.status = "processing";

@@ -97,6 +97,7 @@ router.post("/", requireAuth, async (req: Request, res: Response) => {
     let vendorReference: string | undefined;
     let vendorProductId = product.vendorProductId || `${product.network}_${product.dataAmount}`;
     let vendorError: string | undefined;
+    let vendorWebhookUrl: string | undefined;
 
     // Only call AllenDataHub for wallet payments (user has sufficient balance already)
     // For Paystack, we wait for the webhook to confirm payment before calling the vendor
@@ -110,10 +111,12 @@ router.post("/", requireAuth, async (req: Request, res: Response) => {
           throw new Error(`Invalid data amount for AllenDataHub: ${product.dataAmount}`);
         }
 
+        const webhookTarget = `${req.protocol}://${req.get("host")}/api/vendor/allen-datahub/webhook`;
         const result = await allenDataHubService.purchaseDataBundle({
           phoneNumber: formattedPhone,
           network: product.network,
           volume,
+          webhookUrl: webhookTarget,
         });
 
         if (!result) {
@@ -123,6 +126,7 @@ router.post("/", requireAuth, async (req: Request, res: Response) => {
         if (result.success) {
           vendorOrderId = result.transactionId || result.orderId;
           vendorReference = result.reference;
+          vendorWebhookUrl = webhookTarget;
           req.log.info(`✅ [AllenDataHub] Order created successfully. Vendor ID: ${vendorOrderId}`);
         } else {
           vendorError = result?.error || "Unknown AllenDataHub error";
@@ -170,6 +174,7 @@ router.post("/", requireAuth, async (req: Request, res: Response) => {
         idempotencyKey,
         vendorOrderId,
         vendorReference,
+        vendorWebhookUrl,
         vendorProductId,
         vendorStatus: vendorOrderId ? "pending" : undefined,
         webhookHistory: [],
