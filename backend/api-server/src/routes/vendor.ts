@@ -241,29 +241,41 @@ router.post("/webhook", async (req: Request, res: Response) => {
     }
 
     if (order) {
-      const oldStatus = order.vendorStatus || order.status;
+      const oldOrderStatus = order.status;
+      const oldVendorStatus = order.vendorStatus;
 
-      order.vendorStatus = mappedStatus;
+      // Save the raw vendor status (normalized string) separately from our mapped status
+      order.vendorStatus = vendorStatus || order.vendorStatus;
+
+      // Only update the mapped `order.status` if we are not regressing a final state
+      const isFinal = oldOrderStatus === "completed" || oldOrderStatus === "failed";
+
       if (mappedStatus === "completed") {
         order.status = "completed";
         req.log.info(`✅ [AllenDataHub Webhook] Order ${order._id} completed. Vendor ID: ${orderId}`);
       } else if (mappedStatus === "failed") {
         order.status = "failed";
         req.log.error(`❌ [AllenDataHub Webhook] Order ${order._id} failed. Vendor ID: ${orderId}. Reason: ${status}`);
+      } else if (!isFinal) {
+        // Keep non-final statuses as processing to indicate in-progress
+        if (mappedStatus === "processing" || mappedStatus === "pending") {
+          order.status = "processing";
+          req.log.info(`⏳ [AllenDataHub Webhook] Order ${order._id} status updated to processing. Vendor ID: ${orderId}`);
+        }
       } else {
-        order.status = "processing";
-        req.log.info(`⏳ [AllenDataHub Webhook] Order ${order._id} status updated to processing. Vendor ID: ${orderId}`);
+        req.log.info(`ℹ️ [AllenDataHub Webhook] Order ${order._id} already in final state (${oldOrderStatus}); skipping non-final update.`);
       }
 
       if (!order.webhookHistory) order.webhookHistory = [];
       order.webhookHistory.push({
-        status: vendorStatus,
+        mappedStatus: mappedStatus,
+        vendorStatus: vendorStatus,
         timestamp: webhookResult.timestamp,
         rawPayload,
       });
 
       await order.save();
-      req.log.info(`[AllenDataHub Webhook] Order ${order._id} updated: ${oldStatus} → ${order.status} (${vendorStatus})`);
+      req.log.info(`[AllenDataHub Webhook] Order ${order._id} updated: status ${oldOrderStatus} → ${order.status}; vendorStatus ${oldVendorStatus} → ${order.vendorStatus}`);
     } else {
       req.log.warn(`[AllenDataHub Webhook] ⚠️ No local order found for vendor order: ${orderId}. Reference: ${reference}. Tried lookups: ${JSON.stringify(lookupStrategies)}`);
       req.log.warn(`[AllenDataHub Webhook] Webhook payload for debugging:`, rawPayload);

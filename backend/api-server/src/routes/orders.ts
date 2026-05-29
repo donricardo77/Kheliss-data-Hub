@@ -357,20 +357,28 @@ router.post("/:id/sync", requireAuth, async (req: Request, res: Response) => {
         order.vendorReference = vendorReference;
       }
 
+      if (rawStatus) {
+        // store the raw vendor-facing status separately
+        order.vendorStatus = rawStatus;
+      }
+
+      const oldOrderStatus = order.status;
+      const isFinal = oldOrderStatus === "completed" || oldOrderStatus === "failed";
+
       if (mappedStatus) {
-        order.vendorStatus = mappedStatus;
         if (mappedStatus === "completed") {
           order.status = "completed";
         } else if (mappedStatus === "failed") {
           order.status = "failed";
-        } else {
+        } else if (!isFinal) {
           order.status = "processing";
         }
       }
 
       if (!order.webhookHistory) order.webhookHistory = [];
       order.webhookHistory.push({
-        status: rawStatus || String(vendorStatus || ""),
+        mappedStatus: mappedStatus,
+        vendorStatus: rawStatus || String(vendorStatus || ""),
         timestamp: new Date(),
         rawPayload: vendorData,
       });
