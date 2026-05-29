@@ -12,6 +12,7 @@ const OrderSchema = new mongoose.Schema({
   status: { type: String, enum: ["pending", "processing", "completed", "failed"], default: "pending" },
   paymentMethod: { type: String, enum: ["paystack", "wallet", "vendor_wallet"], required: true },
   paymentReference: { type: String },
+  clientOrderReference: { type: String, index: true },
   
   // Timestamps
   placedAt: { type: Date, default: Date.now }, // When the order was placed by user
@@ -46,6 +47,7 @@ export interface IOrder {
   status: "pending" | "processing" | "completed" | "failed";
   paymentMethod: "paystack" | "wallet" | "vendor_wallet";
   paymentReference?: string;
+  clientOrderReference?: string;
   placedAt: Date;
   idempotencyKey?: string;
   vendorOrderId?: string;
