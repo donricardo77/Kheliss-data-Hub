@@ -180,6 +180,7 @@ router.post("/webhook", async (req: Request, res: Response) => {
     }
 
     const lookupStrategies = [
+      { _id: webhookResult.orderId },
       { vendorOrderId: webhookResult.orderId },
       { vendorReference: webhookResult.reference },
       { paymentReference: webhookResult.reference },
@@ -187,13 +188,21 @@ router.post("/webhook", async (req: Request, res: Response) => {
     ];
 
     let order = null;
+    let matchedQuery: Record<string, any> | null = null;
     for (const query of lookupStrategies) {
       order = await Order.findOne(query as any);
-      if (order) break;
+      if (order) {
+        matchedQuery = query as any;
+        break;
+      }
     }
 
     if (!order) {
       return res.status(200).json({ received: true, success: false, message: "Order not found" });
+    }
+
+    if (matchedQuery) {
+      (req as any).log.info(`AllenDataHub webhook matched order with query: ${JSON.stringify(matchedQuery)}`);
     }
 
     const incomingStatus = webhookResult.status?.toString().toLowerCase() || "pending";

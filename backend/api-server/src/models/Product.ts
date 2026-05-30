@@ -14,8 +14,7 @@ const ProductSchema = new mongoose.Schema({
   productValue: { type: String }, // e.g., "1GB", "2GB"
 }, { timestamps: true, collection: "products" });
 
-// Index for efficient querying by network
-ProductSchema.index({ network: 1 });
+// Index for efficient querying by type (network is already indexed via inline index: true)
 ProductSchema.index({ type: 1 });
 
 export interface IProduct {
