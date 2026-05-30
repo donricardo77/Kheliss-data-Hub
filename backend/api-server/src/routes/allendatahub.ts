@@ -172,6 +172,13 @@ router.post("/webhook", async (req: Request, res: Response) => {
       return res.status(200).json({ received: true, success: false, error: webhookResult.error });
     }
 
+    // Log parsed identifiers to aid debugging when lookups fail
+    try {
+      (req as any).log.info(`AllenDataHub webhook parsed: orderId=${webhookResult.orderId}, reference=${webhookResult.reference}, status=${webhookResult.status}`);
+    } catch (err) {
+      // ignore logging errors
+    }
+
     const lookupStrategies = [
       { vendorOrderId: webhookResult.orderId },
       { vendorReference: webhookResult.reference },

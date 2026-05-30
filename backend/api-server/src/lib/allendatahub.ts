@@ -256,9 +256,69 @@ class AllenDataHubService {
 
     const source = getWebhookPayloadSource(payload);
     const event = source.webhookEvent || source.event || source.type || payload.webhookEvent || payload.event || payload.type || "unknown";
-    const orderId = source.orderId || source.vendorOrderId || source.order_id || source.transactionId || source.reference || source.clientOrderReference || source.vendorReference || payload.orderId || payload.vendorOrderId || payload.order_id || payload.transactionId;
-    const reference = source.reference || source.requestId || source.clientOrderReference || source.vendorReference || source.orderId || source.vendorOrderId || payload.reference || payload.requestId || payload.clientOrderReference || payload.vendorReference;
-    const status = source.status || source.vendorStatus || source.state || source.statusCode || source.orderStatus || source.currentStatus || payload.status || payload.vendorStatus || payload.state || payload.statusCode;
+    // Accept a wider range of possible identifier field names from vendor payloads
+    const orderId =
+      source.orderId ||
+      source.vendorOrderId ||
+      source.order_id ||
+      source.transactionId ||
+      source.transaction_id ||
+      source.id ||
+      source.orderRef ||
+      source.order_ref ||
+      source.orderReference ||
+      source.order_reference ||
+      source.reference ||
+      source.clientOrderReference ||
+      source.vendorReference ||
+      payload.orderId ||
+      payload.vendorOrderId ||
+      payload.order_id ||
+      payload.transactionId ||
+      payload.transaction_id ||
+      payload.id ||
+      payload.orderRef ||
+      payload.order_ref ||
+      payload.orderReference ||
+      payload.order_reference;
+
+    const reference =
+      source.reference ||
+      source.requestId ||
+      source.request_id ||
+      source.clientOrderReference ||
+      source.vendorReference ||
+      source.orderRef ||
+      source.order_ref ||
+      source.orderReference ||
+      source.order_reference ||
+      source.id ||
+      payload.reference ||
+      payload.requestId ||
+      payload.request_id ||
+      payload.clientOrderReference ||
+      payload.vendorReference ||
+      payload.orderRef ||
+      payload.order_ref ||
+      payload.orderReference ||
+      payload.order_reference ||
+      payload.id;
+
+    const status =
+      source.status ||
+      source.vendorStatus ||
+      source.state ||
+      source.statusCode ||
+      source.orderStatus ||
+      source.currentStatus ||
+      source.result ||
+      source.status_message ||
+      payload.status ||
+      payload.vendorStatus ||
+      payload.state ||
+      payload.statusCode ||
+      payload.result ||
+      payload.status_message;
 
     if (!orderId && !reference) {
       return { success: false, error: "Missing orderId or reference in webhook payload" };
@@ -267,7 +327,8 @@ class AllenDataHubService {
     const timestampValue = source.timestamp || source.updatedAt || payload.timestamp || payload.updatedAt;
     const timestamp = timestampValue ? new Date(timestampValue) : new Date();
 
-    return {
+    // Add a small debug-friendly object so webhook handlers can log exactly what was parsed
+    const parsed = {
       success: true,
       event,
       orderId,
@@ -275,11 +336,20 @@ class AllenDataHubService {
       reference,
       status: status?.toString(),
       webhookEvent: event,
-      phoneNumber: source.phoneNumber || source.recipientPhone || source.msisdn || source.msisdn || payload.phoneNumber || payload.recipientPhone || payload.msisdn,
-      dataAmount: source.dataAmount || source.volume || source.bundleSize || source.dataAmount || source.volume || source.bundleSize,
+      phoneNumber: source.phoneNumber || source.recipientPhone || source.msisdn || payload.phoneNumber || payload.recipientPhone || payload.msisdn,
+      dataAmount: source.dataAmount || source.volume || source.bundleSize || payload.dataAmount || payload.volume || payload.bundleSize,
       timestamp,
       raw: payload,
-    };
+    } as WebhookParseResult;
+
+    // Helpful console.info to aid in diagnosing mismatched fields in production logs
+    try {
+      console.info(`[AllenDataHub] Parsed webhook: orderId=${String(parsed.orderId)}, reference=${String(parsed.reference)}, status=${String(parsed.status)}, event=${String(parsed.webhookEvent)}`);
+    } catch (err) {
+      // ignore logging errors
+    }
+
+    return parsed;
   }
 }
 
