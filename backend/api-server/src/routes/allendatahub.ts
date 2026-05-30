@@ -189,15 +189,19 @@ router.post("/webhook", async (req: Request, res: Response) => {
 
     let order = null;
     let matchedQuery: Record<string, any> | null = null;
+    let strategyIndex = 0;
     for (const query of lookupStrategies) {
       order = await Order.findOne(query as any);
       if (order) {
         matchedQuery = query as any;
+        (req as any).log.info(`AllenDataHub webhook found order using strategy ${strategyIndex}: ${JSON.stringify(query)}`);
         break;
       }
+      strategyIndex++;
     }
 
     if (!order) {
+      (req as any).log.error(`AllenDataHub webhook: Order NOT found. Tried all strategies. orderId=${webhookResult.orderId}, reference=${webhookResult.reference}`);
       return res.status(200).json({ received: true, success: false, message: "Order not found" });
     }
 
@@ -206,29 +210,47 @@ router.post("/webhook", async (req: Request, res: Response) => {
     }
 
     const incomingStatus = webhookResult.status?.toString().toLowerCase() || "pending";
+    const oldStatus = order.status;
     const oldVendorStatus = order.vendorStatus;
 
+    // Determine new status based on incoming status
+    let newStatus: "pending" | "processing" | "completed" | "failed" = order.status;
+    let newVendorStatus: string = order.vendorStatus || "pending";
+
     if (["completed", "delivered", "success", "resolved"].includes(incomingStatus)) {
-      order.status = "completed";
-      order.vendorStatus = "completed";
+      newStatus = "completed";
+      newVendorStatus = "completed";
     } else if (["failed", "cancelled", "refunded"].includes(incomingStatus)) {
-      order.status = "failed";
-      order.vendorStatus = "failed";
+      newStatus = "failed";
+      newVendorStatus = "failed";
     } else if (["processing", "pending"].includes(incomingStatus)) {
-      order.status = "processing";
-      order.vendorStatus = incomingStatus as any;
+      newStatus = "processing";
+      newVendorStatus = incomingStatus;
     }
 
-    if (!order.webhookHistory) order.webhookHistory = [];
-    order.webhookHistory.push({
-      status: incomingStatus,
-      timestamp: webhookResult.timestamp || new Date(),
-      rawPayload: webhookResult.raw || payload,
-    });
+    // Use atomic update to prevent race conditions
+    const updatedOrder = await Order.findOneAndUpdate(
+      { _id: order._id },
+      {
+        $set: {
+          status: newStatus,
+          vendorStatus: newVendorStatus,
+          updatedAt: new Date(),
+        },
+        $push: {
+          webhookHistory: {
+            status: incomingStatus,
+            timestamp: webhookResult.timestamp || new Date(),
+            rawPayload: webhookResult.raw || payload,
+          },
+        },
+      },
+      { new: true }
+    );
 
-    await order.save();
+    (req as any).log.info(`AllenDataHub webhook updated order: id=${order._id}, status: ${oldStatus} → ${updatedOrder?.status}, vendorStatus: ${oldVendorStatus} → ${updatedOrder?.vendorStatus}`);
 
-    return res.status(200).json({ received: true, success: true, order: formatOrder(order) });
+    return res.status(200).json({ received: true, success: true, order: formatOrder(updatedOrder) });
   } catch (err) {
     return res.status(500).json({ success: false, error: err instanceof Error ? err.message : "Webhook processing failed" });
   }
