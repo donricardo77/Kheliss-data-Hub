@@ -124,7 +124,7 @@ router.post("/", requireAuth, async (req: Request, res: Response) => {
         }
 
         if (result.success) {
-          vendorOrderId = result.transactionId || result.orderId;
+          vendorOrderId = result.orderId || result.transactionId;
           vendorReference = result.reference;
           vendorWebhookUrl = webhookTarget;
           req.log.info(`✅ [AllenDataHub] Order created successfully. Vendor ID: ${vendorOrderId}`);

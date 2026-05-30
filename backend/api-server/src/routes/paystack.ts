@@ -124,7 +124,7 @@ router.post("/webhook", async (req: Request, res: Response) => {
               });
 
               if (result && result.success) {
-                order.vendorOrderId = result.transactionId || result.orderId;
+                order.vendorOrderId = result.orderId || result.transactionId;
                 order.vendorReference = result.reference; // Store reference for webhook lookup
                 order.vendorWebhookUrl = webhookTarget;
                 order.vendorProductId = vendorProductId;

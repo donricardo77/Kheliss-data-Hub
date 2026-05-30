@@ -3,6 +3,7 @@ import { Order } from "../models/Order";
 import { requireAuth, requireAgent } from "../lib/auth-middleware";
 import allenDataHubService from "../lib/allendatahub";
 import { normalizePhoneNumber, validatePhoneNumber } from "../lib/phone-utils";
+import { mongoose } from "../lib/mongodb";
 
 const router = Router();
 
@@ -179,23 +180,43 @@ router.post("/webhook", async (req: Request, res: Response) => {
       // ignore logging errors
     }
 
+    // Build lookup strategies - try both string and ObjectId formats for _id
     const lookupStrategies = [
-      { _id: webhookResult.orderId },
+      { _id: webhookResult.orderId }, // Try as string first
+    ];
+
+    // Try to convert to ObjectId if it looks like a valid MongoDB ID
+    if (webhookResult.orderId && /^[a-f0-9]{24}$/.test(String(webhookResult.orderId))) {
+      try {
+        lookupStrategies.push({ _id: new mongoose.Types.ObjectId(webhookResult.orderId) });
+      } catch (err) {
+        // Skip if conversion fails
+      }
+    }
+
+    // Add additional strategies
+    lookupStrategies.push(
       { vendorOrderId: webhookResult.orderId },
       { vendorReference: webhookResult.reference },
+      { clientOrderReference: webhookResult.reference },
       { paymentReference: webhookResult.reference },
-      { vendorOrderId: webhookResult.reference },
-    ];
+      { vendorOrderId: webhookResult.reference }
+    );
 
     let order = null;
     let matchedQuery: Record<string, any> | null = null;
     let strategyIndex = 0;
     for (const query of lookupStrategies) {
-      order = await Order.findOne(query as any);
-      if (order) {
-        matchedQuery = query as any;
-        (req as any).log.info(`AllenDataHub webhook found order using strategy ${strategyIndex}: ${JSON.stringify(query)}`);
-        break;
+      try {
+        order = await Order.findOne(query as any);
+        if (order) {
+          matchedQuery = query as any;
+          (req as any).log.info(`AllenDataHub webhook found order using strategy ${strategyIndex}: ${JSON.stringify(query, (key, val) => val instanceof mongoose.Types.ObjectId ? val.toString() : val)}`);
+          break;
+        }
+      } catch (err) {
+        // Log but continue to next strategy
+        (req as any).log.debug?.(`Strategy ${strategyIndex} failed: ${err instanceof Error ? err.message : String(err)}`);
       }
       strategyIndex++;
     }
@@ -233,6 +254,8 @@ router.post("/webhook", async (req: Request, res: Response) => {
       { _id: order._id },
       {
         $set: {
+          vendorOrderId: webhookResult.orderId,
+          vendorReference: webhookResult.reference,
           status: newStatus,
           vendorStatus: newVendorStatus,
           updatedAt: new Date(),
