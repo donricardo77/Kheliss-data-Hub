@@ -129,7 +129,8 @@ router.post("/webhook", async (req: Request, res: Response) => {
                 order.vendorWebhookUrl = webhookTarget;
                 order.vendorProductId = vendorProductId;
                 order.vendorStatus = result.status || "pending";
-                order.status = "processing";
+                // Keep the order pending until the vendor sends a status webhook
+                order.status = "pending";
                 req.log.info(`✅ [Paystack Webhook] AllenDataHub order created successfully. Vendor Order ID: ${order.vendorOrderId}`);
               } else {
                 req.log.warn(`❌ [Paystack Webhook] AllenDataHub API failed: ${result?.error || "Unknown error"}`);
