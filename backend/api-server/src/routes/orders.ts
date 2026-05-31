@@ -168,7 +168,7 @@ router.post("/", requireAuth, async (req: Request, res: Response) => {
         productName: product.name,
         recipientPhone,
         amount: price,
-        status: "processing", // Start as processing to sync with vendor
+        status: "pending", // Start as pending until vendor sends an update
         paymentMethod: "wallet",
         paymentReference: reference,
         idempotencyKey,
@@ -196,7 +196,7 @@ router.post("/", requireAuth, async (req: Request, res: Response) => {
       req.log.info(`Order placed successfully. Order ID: ${order._id}, Reference: ${reference}${vendorOrderId ? `, Vendor Order ID: ${vendorOrderId}` : ""}`);
       return res.status(201).json({
         order: formatOrder(order),
-        message: vendorOrderId ? "Order placed - processing via vendor" : "Order placed - awaiting processing",
+        message: vendorOrderId ? "Order placed - pending vendor fulfillment" : "Order placed - awaiting processing",
         vendorOrderId,
         vendorError,
       });
