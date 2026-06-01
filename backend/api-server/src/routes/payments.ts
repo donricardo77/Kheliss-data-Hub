@@ -388,12 +388,14 @@ req.log.info(`[Paystack Webhook] Order ${order._id} payment confirmed, calling A
               });
               
               if (result && result.success) {
-                order.vendorOrderId = result.transactionId || result.orderId;
+                // Prefer vendor-provided `orderId` when available, fall back to `transactionId`.
+                // Keep order in `pending` state until vendor sends a webhook (same as wallet flow).
+                order.vendorOrderId = result.orderId || result.transactionId;
                 order.vendorReference = result.reference; // Store reference for webhook lookup
                 order.vendorWebhookUrl = webhookTarget;
                 order.vendorProductId = vendorProductId;
                 order.vendorStatus = result.status || "pending";
-                order.status = "processing";
+                order.status = "pending";
                 req.log.info(`✅ [Paystack Webhook] AllenDataHub order created successfully. Vendor Order ID: ${order.vendorOrderId}`);
               } else {
                 req.log.warn(`❌ [Paystack Webhook] AllenDataHub API failed: ${result?.error || "Unknown error"}`);
