@@ -76,7 +76,7 @@ export default function ForgotPassword() {
                 <span className="text-white font-black text-xl">E</span>
               </div>
               <div>
-                <p className="text-white font-bold text-xl leading-tight">EwuraDataHub</p>
+                <p className="text-white font-bold text-xl leading-tight">Kheliss data Hub</p>
                 <p className="text-white/40 text-xs">Premium Data Services</p>
               </div>
             </div>
@@ -102,7 +102,7 @@ export default function ForgotPassword() {
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
               <span className="text-white font-black text-lg">E</span>
             </div>
-            <span className="font-bold text-xl text-foreground">EwuraDataHub</span>
+            <span className="font-bold text-xl text-foreground">Kheliss data Hub</span>
           </div>
 
           <div className="w-full max-w-sm">
@@ -173,7 +173,7 @@ export default function ForgotPassword() {
               <span className="text-white font-black text-xl">E</span>
             </div>
             <div>
-              <p className="text-white font-bold text-xl leading-tight">EwuraDataHub</p>
+              <p className="text-white font-bold text-xl leading-tight">Kheliss data Hub</p>
               <p className="text-white/40 text-xs">Premium Data Services</p>
             </div>
           </div>
@@ -199,7 +199,7 @@ export default function ForgotPassword() {
           <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
             <span className="text-white font-black text-lg">E</span>
           </div>
-          <span className="font-bold text-xl text-foreground">EwuraDataHub</span>
+          <span className="font-bold text-xl text-foreground">Kheliss data Hub</span>
         </div>
 
         <div className="w-full max-w-sm">

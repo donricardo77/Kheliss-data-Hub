@@ -32,7 +32,7 @@ export default function Home() {
             </h1>
             
             <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl">
-              EwuraDataHub is the most reliable platform to buy airtime and data for MTN, Telecel, and AirtelTigo. Use it for yourself or become an agent to start your reselling business today.
+              Kheliss data Hub is the most reliable platform to buy airtime and data for MTN, Telecel, and AirtelTigo. Use it for yourself or become an agent to start your reselling business today.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
@@ -129,7 +129,7 @@ export default function Home() {
       <section id="pricing" className="py-24 bg-background">
         <div className="container">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">Choose how you use EwuraDataHub</h2>
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">Choose how you use Kheliss data Hub</h2>
             <p className="text-lg text-muted-foreground">Sign up as a regular user for personal use, or become an agent to access wholesale prices.</p>
           </div>
 
@@ -200,7 +200,7 @@ export default function Home() {
         <div className="container relative z-10 text-center">
           <h2 className="text-3xl md:text-5xl font-bold text-primary-foreground mb-6">Ready to get started?</h2>
           <p className="text-primary-foreground/80 text-xl mb-10 max-w-2xl mx-auto">
-            Join thousands of users and agents who trust EwuraDataHub for their daily connectivity needs.
+            Join thousands of users and agents who trust Kheliss data Hub for their daily connectivity needs.
           </p>
           <Link href="/register">
             <Button size="lg" variant="secondary" className="h-14 px-10 text-lg text-primary font-bold">

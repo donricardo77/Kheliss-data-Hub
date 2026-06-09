@@ -43,7 +43,7 @@ export default function Register() {
           localStorage.setItem('token', res.token);
         }
         login(res.user);
-        toast({ title: "Account created!", description: "Welcome to EwuraDataHub" });
+        toast({ title: "Account created!", description: "Welcome to Kheliss data Hub" });
         setLocation(res.user.role === "admin" ? "/admin" : "/dashboard");
       },
       onError: (err: any) => {
@@ -77,7 +77,7 @@ export default function Register() {
           <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
             <span className="text-white font-black text-lg">E</span>
           </div>
-          <span className="font-bold text-xl text-foreground">EwuraDataHub</span>
+          <span className="font-bold text-xl text-foreground">Kheliss data Hub</span>
         </div>
 
         <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
