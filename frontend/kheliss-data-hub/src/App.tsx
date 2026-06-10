@@ -216,7 +216,7 @@ function AppContent() {
   const { user } = useAuth();
   
   return (
-    <CartProvider userId={user?._id}>
+      <CartProvider userId={user?.id}>
       <Router />
     </CartProvider>
   );

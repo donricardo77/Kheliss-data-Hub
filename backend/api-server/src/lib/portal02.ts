@@ -257,7 +257,7 @@ class Portal02Service {
       
       clearTimeout(timeoutId);
       
-      const data = await response.json().catch(() => ({}));
+      const data: any = await response.json().catch(() => ({}));
       if (!response.ok) {
         const msg = data.message || data.error || `HTTP ${response.status}`;
         return { success: false, platform: "Portal-02.com", error: msg, code: response.status, details: data };

@@ -86,6 +86,7 @@ router.post("/register", async (req: Request, res: Response) => {
         message: "Account created successfully",
       });
     });
+      return;
   } catch (err) {
     req.log.error({ err }, "Register error");
     return res.status(500).json({ error: "Server error" });
@@ -160,6 +161,7 @@ router.post("/login", async (req: Request, res: Response) => {
         message: "Login successful",
       });
     });
+      return;
   } catch (err) {
     req.log.error({ err }, "Login error");
     return res.status(500).json({ error: "Server error" });

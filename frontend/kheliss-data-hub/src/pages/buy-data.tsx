@@ -73,7 +73,7 @@ export default function BuyData() {
     }
   );
 
-  const selectedProduct = products?.find((p: any) => p._id === selectedProductId);
+  const selectedProduct = products?.find((p: any) => p.id === selectedProductId);
   const price = selectedProduct ? (isAgent ? selectedProduct.agentPrice : selectedProduct.userPrice) : 0;
 
   const handleAddToCart = () => {
@@ -84,7 +84,7 @@ export default function BuyData() {
     }
     setPhoneError("");
     setItem({
-      productId: selectedProduct._id,
+      productId: selectedProduct.id,
       network: selectedNetwork,
       name: selectedProduct.name,
       description: selectedProduct.description || "",

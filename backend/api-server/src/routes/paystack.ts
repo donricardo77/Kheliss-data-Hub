@@ -50,7 +50,7 @@ router.post("/webhook", async (req: Request, res: Response) => {
           const productName = metadata?.productName;
 
           if (!userId || !productId || !recipientPhone) {
-            req.log.error(`[Paystack Webhook] Missing required metadata for order creation`, { metadata });
+              req.log.error({ metadata }, `[Paystack Webhook] Missing required metadata for order creation`);
             return res.status(200).json({ received: true });
           }
 

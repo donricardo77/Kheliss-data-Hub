@@ -134,7 +134,7 @@ router.get("/verify/:reference", requireAuth, async (req: Request, res: Response
         const username = metadata?.username || user.username;
 
         if (!productId || !recipientPhone) {
-          req.log.error(`Payment verification: Missing metadata for order creation. ProductId: ${productId}, Phone: ${recipientPhone}`, { metadata });
+            req.log.error({ metadata }, `Payment verification: Missing metadata for order creation. ProductId: ${productId}, Phone: ${recipientPhone}`);
           return res.json({ status: "success", message: "Payment verified but order creation failed: missing required fields" });
         }
 

@@ -91,7 +91,7 @@ router.post("/purchase", requireAuth, async (req: Request, res: Response) => {
       username: user.username,
       vendorOrderId: result.orderId || result.transactionId,
       vendorReference: result.reference,
-      clientOrderReference: result.clientOrderReference || result.reference,
+      clientOrderReference: (result as any).clientOrderReference || result.reference,
       vendorWebhookUrl: webhookTarget,
       vendorProductId: `${resolvedNetwork}_${resolvedVolume}`,
       vendorPhoneNumber: phoneNumber,
@@ -299,6 +299,8 @@ router.post("/webhook", async (req: Request, res: Response) => {
       req.log.error({ err }, "AllenDataHub webhook async processing error");
     }
   });
+
+    return;
 });
 
 /**

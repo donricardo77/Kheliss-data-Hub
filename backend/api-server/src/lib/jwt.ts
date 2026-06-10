@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import type { User } from "../models/User";
+import type { IUser } from "../models/User";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-in-production";
 const JWT_EXPIRY = process.env.JWT_EXPIRY || "7d";
@@ -13,7 +13,7 @@ interface TokenPayload {
 /**
  * Generate a JWT token for the given user
  */
-export function generateToken(user: User): string {
+export function generateToken(user: IUser): string {
   const payload: TokenPayload = {
     userId: user._id.toString(),
     email: user.email,
@@ -21,7 +21,7 @@ export function generateToken(user: User): string {
   };
 
   return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRY,
+    expiresIn: JWT_EXPIRY as jwt.SignOptions["expiresIn"],
   });
 }
 

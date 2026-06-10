@@ -129,7 +129,7 @@ export default function Cart() {
             
             // Give toast time to show before redirect to Paystack
             setTimeout(() => {
-              window.location.href = res.paymentUrl;
+                window.location.href = res.paymentUrl!;
             }, 800);
           } else {
             // Unexpected response

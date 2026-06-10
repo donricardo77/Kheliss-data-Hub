@@ -181,7 +181,7 @@ router.post("/webhook", async (req: Request, res: Response) => {
     }
 
     // Build lookup strategies - try both string and ObjectId formats for _id
-    const lookupStrategies = [
+      const lookupStrategies: Array<Record<string, any>> = [
       { _id: webhookResult.orderId }, // Try as string first
     ];
 
@@ -203,7 +203,7 @@ router.post("/webhook", async (req: Request, res: Response) => {
       { vendorOrderId: webhookResult.reference }
     );
 
-    let order = null;
+    let order: any = null;
     let matchedQuery: Record<string, any> | null = null;
     let strategyIndex = 0;
     for (const query of lookupStrategies) {
