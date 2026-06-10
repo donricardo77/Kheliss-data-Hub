@@ -29,7 +29,7 @@ services:
       - key: CORS_ORIGIN
         scope: all
       - key: BACKEND_URL
-        value: https://ewura-hub-api.onrender.com
+        value: https://kheliss-data-hub.onrender.com
         scope: all
       - key: PAYSTACK_PUBLIC_KEY
         scope: all

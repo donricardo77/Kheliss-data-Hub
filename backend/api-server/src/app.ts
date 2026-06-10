@@ -69,7 +69,7 @@ const allowedOrigins = [
   "https://ewuradatahub.vercel.app",
   "https://ewuradatahub.com",
   "https://www.ewuradatahub.com",
-  "https://ewura-hub-api.onrender.com",
+  "https://kheliss-data-hub.onrender.com",
 ];
 
 // Add any additional origins from environment variable

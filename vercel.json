@@ -1,7 +1,7 @@
 {
-  "buildCommand": "pnpm -C frontend/ewura-data-hub run build",
+  "buildCommand": "pnpm -C frontend/kheliss-data-hub run build",
   "installCommand": "pnpm install --no-frozen-lockfile",
-  "outputDirectory": "frontend/ewura-data-hub/dist",
+  "outputDirectory": "frontend/kheliss-data-hub/dist",
   "framework": "vite",
   "rewrites": [
     {

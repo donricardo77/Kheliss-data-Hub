@@ -11,14 +11,14 @@ COPY pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY tsconfig.base.json .
 
 # Copy packages
-COPY frontend/ewura-data-hub ./frontend/ewura-data-hub
+COPY frontend/kheliss-data-hub ./frontend/kheliss-data-hub
 COPY lib ./lib
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
 # Build frontend
-RUN cd frontend/ewura-data-hub && \
+RUN cd frontend/kheliss-data-hub && \
     PORT=5173 \
     BASE_PATH=/ \
     pnpm run build
@@ -30,7 +30,7 @@ FROM nginx:alpine
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy built frontend from builder
-COPY --from=builder /app/frontend/ewura-data-hub/dist/public /usr/share/nginx/html
+COPY --from=builder /app/frontend/kheliss-data-hub/dist/public /usr/share/nginx/html
 
 # Create health check script
 RUN echo '#!/bin/sh' > /healthcheck.sh && \

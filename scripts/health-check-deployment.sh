@@ -11,7 +11,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # Configuration
-RENDER_API_URL=${1:-"https://ewura-hub-api.onrender.com"}
+RENDER_API_URL=${1:-"https://kheliss-data-hub.onrender.com"}
 VERCEL_FRONTEND_URL=${2:-"https://ewuradatahub.vercel.app"}
 
 echo -e "${BLUE}🏥 Ewura Hub - Production Health Check${NC}"

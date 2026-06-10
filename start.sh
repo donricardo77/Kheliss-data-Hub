@@ -46,7 +46,7 @@ sleep 4
 
 # Start frontend in background
 echo -e "${GREEN}Starting Frontend (Port 5173)...${NC}"
-cd "$SCRIPT_DIR/frontend/ewura-data-hub"
+cd "$SCRIPT_DIR/frontend/kheliss-data-hub"
 PORT=5173 BASE_PATH=/ VITE_API_URL=http://localhost:8080 pnpm dev > /tmp/frontend.log 2>&1 &
 FRONTEND_PID=$!
 echo -e "${GREEN}✓ Frontend PID: $FRONTEND_PID${NC}"
