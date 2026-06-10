@@ -129,9 +129,11 @@ if (process.env.NODE_ENV === "production" && sessionSecret === "allendatahub-sup
 
 // Session store - uses MongoDB if URI is configured
 let sessionStore: any;
-if (process.env.MONGODB_URI) {
+const mongoUri = process.env.DATABASE_URL || process.env.MONGODB_URI;
+
+if (mongoUri) {
   sessionStore = new MongoStore({
-    mongoUrl: process.env.MONGODB_URI,
+    mongoUrl: mongoUri,
     dbName: process.env.MONGODB_DB || "allen-datahub",
     collectionName: "sessions",
     touchAfter: 24 * 3600, // Lazy session update (touch every 24 hours)

@@ -6,9 +6,9 @@ let isConnected = false;
 export async function connectMongoDB(): Promise<void> {
   if (isConnected) return;
 
-  const uri = process.env.MONGODB_URI;
+  const uri = process.env.DATABASE_URL || process.env.MONGODB_URI;
   if (!uri) {
-    logger.warn("MONGODB_URI not set - running without MongoDB. Set MONGODB_URI secret to enable database persistence.");
+    logger.warn("DATABASE_URL/MONGODB_URI not set - running without MongoDB. Set one of these secrets to enable database persistence.");
     return;
   }
 
