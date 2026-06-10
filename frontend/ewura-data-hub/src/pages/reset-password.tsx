@@ -206,7 +206,7 @@ export default function ResetPassword() {
         <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-background">
           <div className="lg:hidden flex items-center gap-3 mb-10">
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-              <span className="text-white font-black text-lg">E</span>
+              <span className="text-white font-black text-lg">K</span>
             </div>
             <span className="font-bold text-xl text-foreground">Kheliss data Hub</span>
           </div>
