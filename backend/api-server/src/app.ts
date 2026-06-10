@@ -133,9 +133,9 @@ if (process.env.MONGODB_URI) {
   sessionStore = new MongoStore({
     mongoUrl: process.env.MONGODB_URI,
     dbName: process.env.MONGODB_DB || "allen-datahub",
-    collection: "sessions",
+    collectionName: "sessions",
     touchAfter: 24 * 3600, // Lazy session update (touch every 24 hours)
-    connectionOptions: {
+    mongoOptions: {
       maxPoolSize: 10,
       minPoolSize: 2,
     },
@@ -177,7 +177,7 @@ app.use((req, res) => {
 });
 
 // Global error handler - must be last
-app.use((err: any, req: Express.Request, res: Express.Response, _next: Function) => {
+app.use((err: any, req: any, res: any, _next: Function) => {
   logger.error({ err, path: req.path, method: req.method }, "Request error");
   
   const status = err.status || err.statusCode || 500;
