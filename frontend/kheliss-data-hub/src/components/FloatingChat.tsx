@@ -11,7 +11,7 @@ export default function FloatingChat() {
         <div className="absolute bottom-20 right-0 flex flex-col gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200">
           {/* Join Community */}
           <a
-            href="https://chat.whatsapp.com/D5t3NNEwvtvJ8ZXNfNxQla"
+            href="https://chat.whatsapp.com/JwkJbGZoWwV1iyHCtvTLnv?s=cl&p=a&mlu=4"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg transition-colors whitespace-nowrap"
@@ -22,7 +22,7 @@ export default function FloatingChat() {
 
           {/* Contact Admin */}
           <a
-            href="https://wa.me/233249083825"
+            href="https://wa.me/message/YYC565XHTZU4D1"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg shadow-lg transition-colors whitespace-nowrap"
