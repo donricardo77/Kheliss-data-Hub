@@ -33,6 +33,51 @@ router.post("/webhook", async (req: Request, res: Response) => {
       const reference = event.data.reference;
       const metadata = event.data.metadata;
       req.log.info(`[Paystack Webhook] Processing charge.success for reference: ${reference}`);
+
+      // Handle wallet fund transactions first because they do not create an Order.
+      if (metadata?.type === "wallet_fund") {
+        const amount = metadata.amount;
+        const userId = metadata.userId;
+        const adminFee = metadata.adminFee;
+        const totalCharged = metadata.totalChargeAmount;
+
+        req.log.info(`[Paystack Webhook] Processing wallet fund: ${amount} (with ${adminFee} admin fee, total: ${totalCharged}) for user ${userId}`);
+
+        try {
+          const existingTx = await WalletTransaction.findOne({ reference });
+          if (existingTx) {
+            req.log.info(`[Paystack Webhook] Transaction already processed for reference: ${reference}`);
+            return res.status(200).json({ received: true });
+          }
+
+          const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            {
+              $inc: { walletBalance: amount, totalFunded: amount },
+            },
+            { new: true },
+          );
+
+          if (!updatedUser) {
+            req.log.error(`[Paystack Webhook] User ${userId} not found`);
+            return res.status(200).json({ received: true });
+          }
+
+          await WalletTransaction.create({
+            userId,
+            type: "credit",
+            amount,
+            description: `Wallet funded via Paystack (4% fee: ${adminFee})`,
+            reference,
+          });
+
+          req.log.info(`✅ [Paystack Webhook] Wallet fund successful: ${amount} credited to user ${userId} (Fee: ${adminFee}), New Balance: ${updatedUser.walletBalance}`);
+          return res.status(200).json({ received: true });
+        } catch (walletErr) {
+          req.log.error({ err: walletErr }, `[Paystack Webhook] Wallet fund failed`);
+          return res.status(200).json({ received: true });
+        }
+      }
       
       // Check for existing order using idempotency key from metadata
       const idempotencyKey = metadata?.idempotencyKey;
