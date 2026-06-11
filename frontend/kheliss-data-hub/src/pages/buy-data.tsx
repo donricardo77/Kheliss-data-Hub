@@ -73,7 +73,9 @@ export default function BuyData() {
     }
   );
 
-  const selectedProduct = products?.find((p: any) => p.id === selectedProductId);
+  const getProductId = (product: any) => product?.id ?? product?._id ?? null;
+
+  const selectedProduct = products?.find((product: any) => getProductId(product) === selectedProductId);
   const price = selectedProduct ? (isAgent ? selectedProduct.agentPrice : selectedProduct.userPrice) : 0;
 
   const handleAddToCart = () => {
@@ -190,12 +192,13 @@ export default function BuyData() {
               ) : products && products.length > 0 ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                   {products.map((pkg: any) => {
-                    const active = selectedProductId === pkg._id;
+                        const packageId = getProductId(pkg);
+                        const active = selectedProductId === packageId;
                     const pkgPrice = isAgent ? pkg.agentPrice : pkg.userPrice;
                     return (
                       <button
-                        key={pkg._id}
-                        onClick={() => setSelectedProductId(pkg._id)}
+                            key={packageId}
+                            onClick={() => setSelectedProductId(packageId)}
                         className={`rounded-2xl border-2 p-4 text-left transition-all ${
                           active
                             ? `${net?.border} ${net?.activeBg} shadow-md`
