@@ -70,6 +70,7 @@ const allowedOrigins = [
   "https://ewuradatahub.com",
   "https://www.ewuradatahub.com",
   "https://kheliss-data-hub.onrender.com",
+  "https://khelissdatahub.barnville.net",
 ];
 
 // Add any additional origins from environment variable
