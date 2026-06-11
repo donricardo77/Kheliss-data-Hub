@@ -85,8 +85,9 @@ export default function BuyData() {
       return;
     }
     setPhoneError("");
+    const productId = getProductId(selectedProduct);
     setItem({
-      productId: selectedProduct.id,
+      productId: productId || selectedProductId || "",
       network: selectedNetwork,
       name: selectedProduct.name,
       description: selectedProduct.description || "",
