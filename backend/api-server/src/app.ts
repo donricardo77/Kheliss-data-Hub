@@ -119,7 +119,13 @@ app.use((req, res, next) => {
 });
 
 // Request size limits to prevent DoS
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json({
+  limit: "10mb",
+  verify: (req, _res, buf, encoding) => {
+    const encodingValue = (encoding || "utf-8") as BufferEncoding;
+    (req as any).rawBody = buf.toString(encodingValue);
+  },
+}));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 const sessionSecret = process.env.SESSION_SECRET || "allendatahub-super-secret-jwt-key-2024-for-ghana";

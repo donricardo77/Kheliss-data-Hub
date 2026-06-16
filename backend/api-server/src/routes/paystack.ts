@@ -18,7 +18,8 @@ const router = Router();
 router.post("/webhook", async (req: Request, res: Response) => {
   try {
     // Verify Paystack signature for security
-    const hash = createHmac('sha512', process.env.PAYSTACK_SECRET_KEY || "").update(JSON.stringify(req.body)).digest('hex');
+    const rawBody = req.rawBody || JSON.stringify(req.body);
+    const hash = createHmac('sha512', process.env.PAYSTACK_SECRET_KEY || "").update(rawBody).digest('hex');
     const paystackSignature = req.headers['x-paystack-signature'] as string;
     
     if (hash !== paystackSignature) {
