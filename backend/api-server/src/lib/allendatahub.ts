@@ -1,6 +1,6 @@
 import { normalizePhoneNumber } from "./phone-utils";
 
-const API_KEY = process.env.ALLENDATAHUB_API_KEY || process.env.VENDOR_API_KEY || "adh_live_pcdwbIH0coUXbjD5_O4VpEmRGERMkuyxCx-XMqHFeLo";
+const API_KEY = process.env.ALLENDATAHUB_API_KEY || process.env.VENDOR_API_KEY || "";
 const RAW_BASE_URL = process.env.ALLENDATAHUB_BASE_URL || process.env.VENDOR_API_URL || "https://allen-data-hub-backend.onrender.com";
 const BASE_URL = RAW_BASE_URL
   .replace(/\/+$/, "")
@@ -37,6 +37,15 @@ export interface AllenDataHubProduct {
   dataAmount: string;
   description: string | null;
   apiPrice: number;
+}
+
+interface AllenDataHubPackage {
+  id?: string;
+  name?: string;
+  packageName?: string;
+  network: string;
+  size: string;
+  price?: number;
 }
 
 export interface AllenDataHubPurchaseRequest {
@@ -146,19 +155,32 @@ async function fetchJson<T>(path: string, init: RequestInit = {}): Promise<T> {
 class AllenDataHubService {
   constructor() {
     if (!API_KEY) {
-      console.warn("[AllenDataHub] WARNING: ALLENDATAHUB_API_KEY / VENDOR_API_KEY is not configured. Using built-in key fallback.");
+      console.warn("[AllenDataHub] WARNING: ALLENDATAHUB_API_KEY / VENDOR_API_KEY is not configured.");
     }
     console.log(`[AllenDataHub] Initialized. Base: ${BASE_URL}, Webhook: ${DEFAULT_WEBHOOK_URL}`);
   }
 
   async getProducts(): Promise<AllenDataHubProduct[]> {
-    const data = await fetchJson<{ products: AllenDataHubProduct[] }>("/api/v1/products", {
+    const packages = await this.getPackages();
+    return packages.map((pkg) => ({
+      id: pkg.id || `${pkg.network}_${pkg.size}`,
+      name: pkg.packageName || pkg.name || `${pkg.network} ${pkg.size}`,
+      network: pkg.network,
+      dataAmount: pkg.size,
+      description: null,
+      apiPrice: Number(pkg.price || 0),
+    }));
+  }
+
+  async getPackages(network?: string): Promise<AllenDataHubPackage[]> {
+    const query = network ? `?network=${encodeURIComponent(network)}` : "";
+    const data = await fetchJson<{ packages?: AllenDataHubPackage[] }>(`/api/v1/packages${query}`, {
       method: "GET",
       headers: {
-        "X-API-Key": API_KEY,
+        Authorization: `Bearer ${API_KEY}`,
       },
     });
-    return data.products || [];
+    return data.packages || [];
   }
 
   async purchaseDataBundle({ phoneNumber, network, volume, webhookUrl }: AllenDataHubPurchaseRequest): Promise<AllenDataHubPurchaseResponse> {
@@ -191,31 +213,46 @@ class AllenDataHubService {
       };
     }
 
-    const payload = {
-      phoneNumber: formatPhoneForAllenDataHub(normalized.formatted),
-      network,
-      volume,
-      webhookUrl: webhookUrl || DEFAULT_WEBHOOK_URL,
-    };
-
-    // Debug: log the exact request URL and payload (without exposing API key)
     try {
-      const requestUrl = `${BASE_URL}/api/v1/data/purchase`;
+      const packages = await this.getPackages(network);
+      const requestedSize = `${volume} GB`.replace(/\s+/g, "").toLowerCase();
+      const selectedPackage = packages.find((pkg) =>
+        pkg.network === network && pkg.size.replace(/\s+/g, "").toLowerCase() === requestedSize,
+      );
+
+      if (!selectedPackage) {
+        return {
+          success: false,
+          error: `No enabled AllenDataHub package found for ${network} ${volume} GB`,
+        };
+      }
+
+      const packageName = selectedPackage.packageName || selectedPackage.name || `${network} ${selectedPackage.size}`;
+      const payload = {
+        network: selectedPackage.network,
+        size: selectedPackage.size,
+        recipient: formatPhoneForAllenDataHub(normalized.formatted),
+        packageName,
+        ...(webhookUrl || DEFAULT_WEBHOOK_URL ? { webhookUrl: webhookUrl || DEFAULT_WEBHOOK_URL } : {}),
+      };
+
+      const requestUrl = `${BASE_URL}/api/v1/orders`;
       console.info(`[AllenDataHub] Request URL: ${requestUrl}`);
       console.info(`[AllenDataHub] Payload: ${JSON.stringify(payload)}`);
 
-      const data = await fetchJson<AllenDataHubPurchaseResponse>("/api/v1/data/purchase", {
+      const data = await fetchJson<AllenDataHubPurchaseResponse & { ok?: boolean }>("/api/v1/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-API-Key": API_KEY,
+          Authorization: `Bearer ${API_KEY}`,
         },
         body: JSON.stringify(payload),
       });
 
       return {
         ...data,
-        orderId: data.orderId || data.order?.id || data.transactionId,
+        success: data.ok !== false,
+        orderId: data.orderId || data.order?.id || data.transactionId || data.order?._id,
       };
     } catch (err) {
       const message = err instanceof Error ? err.message : "AllenDataHub API error";

@@ -42,6 +42,12 @@ services:
       - key: PORTAL02_BASE_URL
         value: https://www.portal-02.com/api/v1
         scope: all
+      - key: ALLENDATAHUB_API_KEY
+        sync: false
+        scope: all
+      - key: ALLENDATAHUB_BASE_URL
+        value: https://allen-data-hub-backend.onrender.com
+        scope: all
       - key: BREVO_API_KEY
         scope: all
 
