@@ -46,7 +46,7 @@ services:
         sync: false
         scope: all
       - key: ALLENDATAHUB_BASE_URL
-        value: https://allen-data-hub-backend.onrender.com
+        value: https://allendatahub.onrender.com
         scope: all
       - key: BREVO_API_KEY
         scope: all

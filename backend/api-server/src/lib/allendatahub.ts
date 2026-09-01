@@ -1,11 +1,11 @@
 import { normalizePhoneNumber } from "./phone-utils";
 
 const API_KEY = process.env.ALLENDATAHUB_API_KEY || process.env.VENDOR_API_KEY || "";
-const RAW_BASE_URL = process.env.ALLENDATAHUB_BASE_URL || process.env.VENDOR_API_URL || "https://allen-data-hub-backend.onrender.com";
+const RAW_BASE_URL = process.env.ALLENDATAHUB_BASE_URL || process.env.VENDOR_API_URL || "https://allendatahub.onrender.com";
 const BASE_URL = RAW_BASE_URL
   .replace(/\/+$/, "")
   .replace(/\/api\/v1$/i, "")
-  .replace(/^https?:\/\/(www\.)?allendatahub\.com/i, "https://allen-data-hub-backend.onrender.com");
+  .replace(/^https?:\/\/(www\.)?allendatahub\.com/i, "https://allendatahub.onrender.com");
 const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8080";
 const DEFAULT_WEBHOOK_URL = `${BACKEND_URL.replace(/\/+$/, "")}/api/vendor/allen-datahub/webhook`;
 

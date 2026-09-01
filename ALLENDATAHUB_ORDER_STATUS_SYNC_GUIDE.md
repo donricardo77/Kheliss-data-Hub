@@ -45,7 +45,7 @@ Your Server (receives update)
 When creating an order, **include a `webhookUrl` parameter**:
 
 ```bash
-curl -X POST "https://allen-data-hub-backend.onrender.com/api/v1/data/purchase" \
+curl -X POST "https://allendatahub.onrender.com/api/v1/data/purchase" \
   -H "X-API-Key: adh_live_your_key_here" \
   -H "Content-Type: application/json" \
   -d '{
@@ -206,7 +206,7 @@ async function pollOrderStatus(orderId: string, maxAttempts = 60) {
   while (attempts < maxAttempts) {
     try {
       const response = await fetch(
-        `https://allen-data-hub-backend.onrender.com/api/v1/orders/${orderId}`,
+        `https://allendatahub.onrender.com/api/v1/orders/${orderId}`,
         {
           headers: {
             "X-API-Key": apiKey,
@@ -284,7 +284,7 @@ console.log("Final status:", order.status);
 
 3. **Verify webhookUrl was received**
    ```bash
-   curl -X GET "https://allen-data-hub-backend.onrender.com/api/v1/orders/ORDER_ID" \
+   curl -X GET "https://allendatahub.onrender.com/api/v1/orders/ORDER_ID" \
      -H "X-API-Key: adh_live_..."
    
    # Check response for "webhookUrl" field
@@ -305,7 +305,7 @@ console.log("Final status:", order.status);
 
 1. **Check order creation was successful**
    ```bash
-   curl "https://allen-data-hub-backend.onrender.com/api/v1/orders/ORDER_ID" \
+   curl "https://allendatahub.onrender.com/api/v1/orders/ORDER_ID" \
      -H "X-API-Key: adh_live_..."
    ```
 
@@ -318,7 +318,7 @@ console.log("Final status:", order.status);
    ```bash
    # Poll every 30 seconds
    for i in {1..10}; do
-     curl "https://allen-data-hub-backend.onrender.com/api/v1/orders/ORDER_ID" \
+     curl "https://allendatahub.onrender.com/api/v1/orders/ORDER_ID" \
        -H "X-API-Key: adh_live_..."
      echo "Poll #$i"
      sleep 30
@@ -352,7 +352,7 @@ console.log("Final status:", order.status);
 
 3. **Verify firewall/network allows incoming requests**
    - Check that your server isn't blocking inbound connections
-   - Whitelist: `https://allen-data-hub-backend.onrender.com`
+   - Whitelist: `https://allendatahub.onrender.com`
 
 4. **Check response time**
    - Endpoint must respond within 10 seconds
@@ -391,7 +391,7 @@ import express from "express";
 const app = express();
 app.use(express.json());
 
-const BASE_URL = "https://allen-data-hub-backend.onrender.com";
+const BASE_URL = "https://allendatahub.onrender.com";
 const API_KEY = process.env.ALLENDATAHUB_API_KEY;
 
 // In-memory order tracking (use database in production)
@@ -549,7 +549,7 @@ If you're still experiencing issues:
 
 ### Create Order with Webhook
 ```bash
-curl -X POST "https://allen-data-hub-backend.onrender.com/api/v1/data/purchase" \
+curl -X POST "https://allendatahub.onrender.com/api/v1/data/purchase" \
   -H "X-API-Key: adh_live_YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -562,7 +562,7 @@ curl -X POST "https://allen-data-hub-backend.onrender.com/api/v1/data/purchase" 
 
 ### Poll Order Status
 ```bash
-curl "https://allen-data-hub-backend.onrender.com/api/v1/orders/ORDER_ID" \
+curl "https://allendatahub.onrender.com/api/v1/orders/ORDER_ID" \
   -H "X-API-Key: adh_live_YOUR_KEY"
 ```
 
